@@ -100,13 +100,11 @@ int main() {
                    0.0, -0.5,
                    0.1, -0.9};
   
-  // Set up a Vertex Buffer for rendering
+  // Set up Vertex Buffers for rendering
   unsigned int shipBuffer;
   glGenBuffers(1, &shipBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, shipBuffer);
-  glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), &ship[0],
-               GL_STATIC_DRAW);
-
+  glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), &ship[0], GL_STATIC_DRAW);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
   glEnableVertexAttribArray(0);
 
@@ -152,6 +150,8 @@ int main() {
   unsigned int shipShader = CreateShader(vertexShader, shipFragmentShader);
   unsigned int gridShader = CreateShader(vertexShader, gridFragmentShader);
 
+  std::cout << "Vertical:  " << (numberOfLanes + 1) * 4 / 2 << "\n";
+  std::cout << "Horizontal:" << (numberOfBlocksInFront + 1) * 4 / 2 << "\n";
   glViewport(0, 0, windowWidth, windowHeight);
   // Render loop
   while (!glfwWindowShouldClose(window)) {
@@ -159,20 +159,23 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(gridShader);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertical) * sizeof(float), &gridVertical[0],
-                 GL_STATIC_DRAW);
-    glDrawArrays(GL_LINES, 0, 22);
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(gridHorizontal) * sizeof(float), &gridHorizontal[0],
-                 GL_STATIC_DRAW);
-    glDrawArrays(GL_LINES, 0, 18);
+
+
+    // Render the grid of the track
+    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertical) * sizeof(float), &gridVertical[0], GL_STATIC_DRAW);
+    // The division by 2 trasforms the number or coordinates in number of verties
+    glDrawArrays(GL_LINES, 0, (numberOfLanes + 1) * 4 / 2);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(gridHorizontal) * sizeof(float), &gridHorizontal[0], GL_STATIC_DRAW);
+    // The division by 2 trasforms the number or coordinates in number of verties
+    glDrawArrays(GL_LINES, 0, (numberOfBlocksInFront + 1) * 4 / 2);
 
 
 
     glUseProgram(shipShader);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), &ship[0],
-                 GL_STATIC_DRAW);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(ship) * sizeof(float), &ship[0], GL_STATIC_DRAW);
+    glDrawArrays(GL_TRIANGLES, 0, sizeof(ship)/2);
 
 
 
